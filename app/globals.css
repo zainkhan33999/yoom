@@ -7,12 +7,31 @@
   .flex-center{
     @apply flex justify-center items-center
   }
+  .bg-hero {
+    background-image: url('/images/hero-background.png');
+  }   
+  .glassmorphism{
+    background-color: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .glassmorphism2{
+    background-color: rgba(18, 17, 17, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 }
 @custom-variant dark (&:is(.dark *));
 @theme{
   --color-dark1:#1C1F2E;
   --color-dark2:#161925;
   --color-blue1:#0E78F9;
+  --color-sky1:#C9DDFF;
+  --color-sky2:#ECF0FF;
+  --color-sky3:#F5FCFF;
+  --color-orange1:#FF742E;
+  --color-purple:#830EF9;
+  --color-yellow:#F9A90E; 
   
 }
 @theme inline {
