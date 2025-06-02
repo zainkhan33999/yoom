@@ -27,6 +27,9 @@ try {
     const startsAt = values.dateTime.toISOString()||
   new Date(Date.now()).toISOString()
   const description = values.description || "Instant meeting"
+  console.log("Client:", client)
+console.log("User:", user)
+console.log("Call ID:", id)
   await call.getOrCreate({
     data:{
       starts_at:startsAt,
@@ -38,6 +41,7 @@ try {
   setCallDetails (call)
   if(!values.description){
     router.push(`/meeting/${call.id}`)
+    console.log("value",values)
   }
 } catch (error) {
   console.log(error)
