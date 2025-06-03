@@ -6,8 +6,10 @@ import { useUser } from '@clerk/nextjs'
 import { StreamCall, StreamTheme } from '@stream-io/video-react-sdk'
 import { Loader } from 'lucide-react' 
 import React, { useState } from 'react'
+import { useParams } from 'next/navigation'
 const Meeting = ({params}:{params:{id:string}}) => {
   const {user,isLoaded} = useUser()
+  const { id } = useParams();
   const [isSetupComplete, setIsSetupComplete] = useState(false)
   const {call,isCallLoading} = useGetCallByID(id)
   if(!isLoaded || isCallLoading) return <Loader/>
@@ -16,7 +18,7 @@ const Meeting = ({params}:{params:{id:string}}) => {
 <StreamCall call={call}>
   <StreamTheme>
     {!isSetupComplete?(
-      <MeetingSetup/>
+      <MeetingSetup setIsSetupComplete={setIsSetupComplete}/>
     ):<MeetingRoom/>}
   </StreamTheme>
 </StreamCall>
