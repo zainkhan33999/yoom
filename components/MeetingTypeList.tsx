@@ -7,7 +7,11 @@ import MeetingModal from './ui/MeetingModal'
 import { useUser } from '@clerk/nextjs'
 import { useStreamVideoClient } from '@stream-io/video-react-sdk'
 import { useRouter } from 'next/navigation'
+import ReactDatePicker from "react-datepicker"
+import { toast } from "sonner"
+
 const MeetingTypeList = () => {
+
   const router = useRouter()
   const [meetingState, setMeetingState] = useState<'isScheduleMeeting'|'isJoiningMeeting'|'isInstantMeeting'|undefined>()
   const {user} = useUser()
@@ -18,6 +22,7 @@ const MeetingTypeList = () => {
     link:"",
   })
   const [callDetails, setCallDetails] = useState<Call>()
+    const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`
   const createMeeting = async()=>{
 if(!client || !user) return
 try {
@@ -75,6 +80,46 @@ title="Join Meeting"
 description="via inviatation link "
 handleClick ={()=>setMeetingState("isJoiningMeeting")}
 className="bg-yellow1"/>
+{!callDetails?(
+  <MeetingModal
+  isOpen={meetingState==='isScheduleMeeting'}
+  onClose={()=>setMeetingState(undefined)}
+  title="Create Meeting"
+  handleClick={createMeeting}>
+  <div className="flex flex-col gap-2.5 ">
+    <label className='text-base text-normal leading-[22px] text-sky2 '>Add a Description</label>
+   <textarea className='border-none bg-dark2 focus-visible:ring-0 focus-visible:ring-offset-0' onChange={(e)=>{
+    setValues({...values,description:  e.target.value})
+   }}/>
+  </div>
+  <div className='flex w-full flex-col gap-2.5'>
+  <label className='text-base text-normal leading-[22px] text-sky2 '>Select Date and Time</label>
+  <ReactDatePicker
+  selected={values.dateTime}
+  onChange={(date)=>setValues({...values,dateTime:date!})}
+  showTimeSelect
+  timeFormat='HH:mm'
+  timeIntervals={15}
+  timeCaption='time'
+  dateFormat="MMMM d ,yyyy h:mm aa"
+  className='w-full rounded bg-dark2 p-2 focus:outline-none'/>
+  </div>
+    </MeetingModal>
+):(
+  <MeetingModal
+isOpen={meetingState==='isScheduleMeeting'}
+onClose={()=>setMeetingState(undefined)}
+title="Meeting Created"
+className="text-center"
+handleClick={()=>{
+  navigator.clipboard.writeText(meetingLink)
+
+  toast.success("Meeting created successfully!")
+}}
+image='/icons/checked.svg'
+buttonIcon='/icons/copy.svg'
+buttonText="Copy Meeting Link"/>
+)}
 <MeetingModal
 isOpen={meetingState==="isInstantMeeting"}
 onClose={()=>setMeetingState(undefined)}
