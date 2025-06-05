@@ -114,7 +114,7 @@ className="text-center"
 handleClick={()=>{
   navigator.clipboard.writeText(meetingLink)
 
-  toast.success("Meeting created successfully!")
+  toast("Meeting created successfully!")
 }}
 image='/icons/checked.svg'
 buttonIcon='/icons/copy.svg'
