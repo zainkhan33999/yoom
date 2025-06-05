@@ -2,20 +2,21 @@
 import React from 'react'
 import useGetCalls from '@/hooks/useGetCalls'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { Call } from '@stream-io/video-react-sdk'
-import { CallRecording } from '@stream-io/node-sdk'
+import { useState,useEffect } from 'react'
+import { Call,CallRecording  } from '@stream-io/video-react-sdk'
+
 import MeetingCard from './MeetingCard'
+import Loader from './Loader'
 const CallList = ({type}:{type:"ended"|"upcoming"|"recordings"}) => {
-  const {endedCalls,upcomingCalls ,callsRecordings,isLoading} = useGetCalls()
-  const [recordings, setRecordings] = useState<CallRecording[]>([])
+  const {endedCalls,upcomingCalls ,callRecordings,isLoading} = useGetCalls()
+  const [recordings, setRecordings] = useState<CallRecording[]>([]);
   const router = useRouter()
   const getCalls = () =>{
     switch(type){
       case "ended":
       return endedCalls
       case "recordings":
-      return callsRecordings
+      return recordings
       case "upcoming":
       return upcomingCalls
       default:
@@ -37,9 +38,30 @@ const CallList = ({type}:{type:"ended"|"upcoming"|"recordings"}) => {
 
   const calls = getCalls()
   const NoCallMessasge = getNoCallMessasge()
+  useEffect(() => {
+    const fetchRecordings = async () => {
+      const callData = await Promise.all(
+        callRecordings?.map((meeting) => meeting.queryRecordings()) ?? [],
+      );
+
+      const recordings = callData
+        .filter((call) => call.recordings.length > 0)
+        .flatMap((call) => call.recordings);
+
+      setRecordings(recordings);
+    };
+
+    if (type === 'recordings') {
+      fetchRecordings();
+    }
+  }, [type, callRecordings]);
+
+  if (isLoading) return <Loader />;
+
+  
   return (
 
-<div className='grid grid-cols-1 gap-5 xl:grid-cols-2'>
+<div className='grid grid-cols-1gap-5 xl:grid-cols-2'>
     {calls && calls.length > 0 ? calls.map((meeting: Call | CallRecording) => (
       <MeetingCard
       key={(meeting as Call).id}
