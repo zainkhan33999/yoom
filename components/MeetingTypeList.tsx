@@ -9,7 +9,7 @@ import { useStreamVideoClient } from '@stream-io/video-react-sdk'
 import { useRouter } from 'next/navigation'
 import ReactDatePicker from "react-datepicker"
 import { toast } from "sonner"
-
+import { Input } from "../components/ui/input"
 const MeetingTypeList = () => {
 
   const router = useRouter()
@@ -72,7 +72,7 @@ className="bg-blue1"/>
 img="icons/recordings.svg"
 title="View Recordings"
 description="Check out your recordings"
-handleClick ={()=>setMeetingState('isJoiningMeeting')}
+handleClick ={()=>router.push('/recordings')}
 className="bg-purple1"/>
 <HomeCard
 img="icons/join-meeting.svg"
@@ -127,8 +127,19 @@ title="Start an instant meeting"
 className="text-center"
 buttonText="Start Meeting"
 handleClick={createMeeting}/>
+
+<MeetingModal
+isOpen={meetingState==="isJoiningMeeting"}
+onClose={()=>setMeetingState(undefined)}
+title="Type the link here"
+className="text-center"
+buttonText="Start Meeting"
+handleClick={()=>router.push(values.link)}>
+  <Input placeholder='Meeting Link'/>
+</MeetingModal>
    </section>
   )
 }
 
 export default MeetingTypeList
+
