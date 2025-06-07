@@ -28,17 +28,14 @@ type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 const MeetingRoom = () => {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get('personal');
-
-
   const router = useRouter();
   const [layout, setLayout] = useState<CallLayoutType>('speaker-left');
-
   const [showParticipants, setShowParticipants] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
 
-  // for more detail about types of CallingState see: https://getstream.io/video/docs/react/ui-cookbook/ringing-call/#incoming-call-panel
+  
   const callingState = useCallCallingState();
-  console.log(callingState,"ha")
+
   if (callingState !== CallingState.JOINED) return <Loader />;
 
   const CallLayout = () => {
