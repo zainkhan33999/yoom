@@ -18,12 +18,13 @@ const PersonalRoom = () => {
   const router = useRouter()
   const {user} = useUser()
   const meetingId = user?.id
-  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}?personal=true`
+  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}?personal=true`;
+  
   console.log(user)
   const {call} = useGetCallByID(meetingId!)
   const startRoom = async() =>{
     if(!client||!user) return
-    const newCall = client.call('default',meetingId)
+    const newCall = client.call('default',meetingId!)
     if(!call){
       await newCall.getOrCreate({
         data:{
