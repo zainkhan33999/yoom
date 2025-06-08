@@ -21,7 +21,6 @@ const MeetingTypeList = () => {
     description:'',
     link:"",
   })
-  const link = values.link
   const [callDetails, setCallDetails] = useState<Call>()
     const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${callDetails?.id}`
   const createMeeting = async()=>{
@@ -130,16 +129,13 @@ buttonText="Start Meeting"
 handleClick={createMeeting}/>
 
 <MeetingModal
-  isOpen={meetingState === "isJoiningMeeting"}
-  onClose={() => setMeetingState(undefined)}
-  title="Type the link here"
-  className="text-center"
-  buttonText="Start Meeting"
-  handleClick={() => router.push(link)}
->
-  <Input placeholder="Meeting Link" 
-           onChange={(e) => setValues({ ...values, link: e.target.value })}   
-  />
+isOpen={meetingState==="isJoiningMeeting"}
+onClose={()=>setMeetingState(undefined)}
+title="Type the link here"
+className="text-center"
+buttonText="Start Meeting"
+handleClick={()=>router.push(values.link)}>
+  <Input placeholder='Meeting Link'/>
 </MeetingModal>
    </section>
   )
