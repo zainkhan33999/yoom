@@ -3,7 +3,7 @@ import { useUser } from '@clerk/nextjs';
 import React from 'react'
 import { Button } from '@/components/ui/button';
 import {toast} from "sonner"
-import { useGetCallById } from '@/hooks/useGetCallById';
+import { useGetCallByID } from '@/hooks/useGetCallById';
 import { useStreamVideoClient } from '@stream-io/video-react-sdk';
 import { useRouter } from 'next/navigation';
 const Table =({title,description}:{title:string;description:string})=>(
@@ -21,7 +21,7 @@ const PersonalRoom = () => {
   const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}?personal=true`;
   
   console.log(user)
-  const {call} = useGetCallById(meetingId!)
+  const {call} = useGetCallByID(meetingId!)
   const startRoom = async() =>{
     if(!client||!user) return
     const newCall = client.call('default',meetingId!)
