@@ -18,7 +18,7 @@ const PersonalRoom = () => {
   const router = useRouter()
   const {user} = useUser()
   const meetingId = user?.id
-const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}`;
+  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}?personal=true`;
   
   console.log(user)
   const {call} = useGetCallById(meetingId!)
@@ -33,7 +33,7 @@ const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}`;
         }
       })
     }
-    router.push(`/meeting/${meetingId}`)
+    router.push(`/meeting/${meetingId}?personal=true`)
   }
   return (
     <section className="flex size-full flex-col gap-10 text-white">
