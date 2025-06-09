@@ -35,7 +35,7 @@ const MeetingTypeList = () => {
     if (!client || !user) return;
     try {
       if (!values.dateTime) {
-        toast({ title: 'Please select a date and time' });
+        toast( ' Please select a date and time' );
         return;
       }
       const id = crypto.randomUUID();
@@ -56,12 +56,10 @@ const MeetingTypeList = () => {
       if (!values.description) {
         router.push(`/meeting/${call.id}`);
       }
-      toast({
-        title: 'Meeting Created',
-      });
+      toast( ' Please select a date and time' );
     } catch (error) {
       console.error(error);
-      toast({ title: 'Failed to create Meeting' });
+      toast( ' Please select a date and time' );
     }
   };
 
@@ -141,7 +139,7 @@ const MeetingTypeList = () => {
           title="Meeting Created"
           handleClick={() => {
             navigator.clipboard.writeText(meetingLink);
-            toast({ title: 'Link Copied' });
+            toast( ' Please select a date and time' );
           }}
           image={'/icons/checked.svg'}
           buttonIcon="/icons/copy.svg"
