@@ -15,6 +15,7 @@ const Table =({title,description}:{title:string;description:string})=>(
 
 const PersonalRoom = () => {
   const client = useStreamVideoClient()
+  console.log(client,"client")
   const router = useRouter()
   const {user} = useUser()
   const meetingId = user?.id
