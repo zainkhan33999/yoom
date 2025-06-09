@@ -18,7 +18,7 @@ const PersonalRoom = () => {
   const router = useRouter()
   const {user} = useUser()
   const meetingId = user?.id
-  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/meeting/${meetingId}?personal=true`;
+  const meetingLink = `https://video-black-mu.vercel.app/meeting/${meetingId}?personal=true`;
   
   console.log(user)
   const {call} = useGetCallById(meetingId!)
