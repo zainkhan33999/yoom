@@ -85,7 +85,7 @@ const CallList = ({type}:{type:"ended"|"upcoming"|"recordings"}) => {
       link={
         type === 'recordings'
           ? (meeting as CallRecording).url
-          : `https://video-black-mu.vercel.app/meeting/${(meeting as Call).id}`
+          : `${process.env.NEXT_PUBLIC_BASE_URL}/${(meeting as Call).id}`
       }
       buttonIcon1={type === 'recordings' ? '/icons/play.svg' : undefined}
       buttonText={type === 'recordings' ? 'Play' : 'Start'}

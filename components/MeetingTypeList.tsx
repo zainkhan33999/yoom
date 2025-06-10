@@ -52,6 +52,7 @@ const MeetingTypeList = () => {
           },
         },
       });
+      console.log(client,"client")
       setCallDetail(call);
       if (!values.description) {
         router.push(`/meeting/${call.id}`);
@@ -65,7 +66,7 @@ const MeetingTypeList = () => {
 
   if (!client || !user) return <Loader />;
 
-  const meetingLink = `https://video-black-mu.vercel.app/meeting/${callDetail?.id}`;
+  const meetingLink = `voom-five.vercel.app/${callDetail?.id}`;
 
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
