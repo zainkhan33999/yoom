@@ -1,11 +1,11 @@
 'use client';
 
-import { useState,useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import HomeCard from '../components/ui/HomeCard';
 import MeetingModal from '../components/ui/MeetingModal';
-import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
+import {  useStreamVideoClient } from '@stream-io/video-react-sdk';
 import { useUser } from '@clerk/nextjs';
 import Loader from '../components/ui/Loader';
 
@@ -25,87 +25,42 @@ const MeetingTypeList = () => {
     'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined
   >(undefined);
   const [values, setValues] = useState(initialValues);
-  const [callDetail, setCallDetail] = useState<Call>();
+  const [callId, setCallId] = useState<string>()
   const client = useStreamVideoClient();
   const { user } = useUser();
 
   console.log('Rendering MeetingTypeList:', {
     meetingState,
     values,
-    callDetail,
+callId,
     clientReady: !!client,
     userLoggedIn: !!user,
   });
 
   const createMeeting = async () => {
-    console.log('createMeeting triggered', { values, client, user });
-    if (!client || !user) {
-      console.error('Stream client or user not initialized');
-      return;
-    }
     try {
-      if (!values.dateTime) {
-        console.warn('No date/time selected');
-        toast('Please select a date and time');
-        return;
-      }
-      const id = crypto.randomUUID();
-      console.log('Creating call with ID:', id);
-      const call = client.call('default', id);
-      console.log('Stream Call Object Created:', call); // ✅ Debug
-      if (!call) {
-        console.error('Failed to initialize call');
-        throw new Error('Failed to create meeting');
-      }
-
-      const startsAt = values.dateTime.toISOString() || new Date(Date.now()).toISOString();
-      const description = values.description || 'Instant Meeting';
-      console.log('Call payload:', { starts_at: startsAt, description });
-
-      await call.getOrCreate({
-        data: { starts_at: startsAt, custom: { description } }
-      }).then((res) => {
-        console.log('Stream API Success:', res); // ✅ Check if this logs
-        return res;
-      }).catch((error) => {
-        console.error('Stream API Failure:', {
-          error: error.message,
-          status: error.response?.status,
-          data: error.response?.data,
-        });
-        throw error;
+      const call = client?.call('default', crypto.randomUUID());
+      await call?.getOrCreate({
+        data: { starts_at: values.dateTime.toISOString() }
       });
       
-      console.log('Call ID Verification:', call.id); // ✅ MUST log here
-      setCallDetail(call); // ❌ Currently failing here in production
-
-      if (!values.description) {
-        console.log("callid",call.id)
-        console.log('Redirecting to meeting:', call.id);
-        router.push(`/meeting/${call.id}`);
-      }
-      toast('Meeting created!');
+      setCallId(call?.id); // Only store ID
+      router.push(`/meeting/${call?.id}`);
+      
     } catch (error) {
-      console.error('Meeting creation failed:', error);
-      toast('Failed to create meeting');
+      console.error('Full error:', error);
     }
   };
-
   if (!client || !user) {
     console.log('Client or user not ready - showing loader');
     return <Loader />;
   }
 
-  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${callDetail?.id}`;
+  const meetingLink = callId 
+  ? `${window.location.origin}/meeting/${callId}`
+  : undefined;
   console.log('Generated meeting link:', meetingLink);
-  useEffect(() => {
-    if (callDetail) {
-      console.log('callDetail State:', {
-        id: callDetail.id, 
-        state: callDetail.state,
-      });
-    }
-  }, [callDetail]);
+
 
       return (
         <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -138,7 +93,7 @@ const MeetingTypeList = () => {
             handleClick={() => router.push('/recordings')}
           />
 
-          {!callDetail ? (
+          {!callId ? (
             <MeetingModal
               isOpen={meetingState === 'isScheduleMeeting'}
               onClose={() => setMeetingState(undefined)}
@@ -178,7 +133,7 @@ const MeetingTypeList = () => {
               onClose={() => setMeetingState(undefined)}
               title="Meeting Created"
               handleClick={() => {
-                navigator.clipboard.writeText(meetingLink);
+                // navigator.clipboard.writeText(meetingLink);
                 toast( ' Please select a date and time' );
               }}
               image={'/icons/checked.svg'}
