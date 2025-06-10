@@ -52,6 +52,7 @@ const MeetingTypeList = () => {
       const id = crypto.randomUUID();
       console.log('Creating call with ID:', id);
       const call = client.call('default', id);
+      console.log('Stream Call Object Created:', call); // ✅ Debug
       if (!call) {
         console.error('Failed to initialize call');
         throw new Error('Failed to create meeting');

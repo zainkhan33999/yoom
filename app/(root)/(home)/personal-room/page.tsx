@@ -21,6 +21,7 @@ const PersonalRoom = () => {
   const meetingId = user?.id
   const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${meetingId}?personal=true`;
   
+  
   console.log(user)
   const {call} = useGetCallById(meetingId!)
   const startRoom = async() =>{
