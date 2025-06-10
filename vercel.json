@@ -1,0 +1,21 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "connect-src 'self' https://*.getstream.io"
+        },
+        {
+          "key": "Upgrade",
+          "value": "websocket"
+        },
+        {
+          "key": "Connection",
+          "value": "Upgrade"
+        }
+      ]
+    }
+  ]
+}
