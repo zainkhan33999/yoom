@@ -1,21 +1,11 @@
 {
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "connect-src 'self' https://*.getstream.io"
-        },
-        {
-          "key": "Upgrade",
-          "value": "websocket"
-        },
-        {
-          "key": "Connection",
-          "value": "Upgrade"
-        }
-      ]
-    }
-  ]
-}
+    "headers": [
+      {
+        "source": "/(.*)",
+        "headers": [
+          { "key": "Access-Control-Allow-Origin", "value": "*" },
+          { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" }
+        ]
+      }
+    ]
+  }
