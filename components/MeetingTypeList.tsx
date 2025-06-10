@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import HomeCard from '../components/ui/HomeCard';
@@ -63,18 +63,24 @@ const MeetingTypeList = () => {
       console.log('Call payload:', { starts_at: startsAt, description });
 
       await call.getOrCreate({
-        data: {
-          starts_at: startsAt,
-          custom: {
-            description,
-          },
-        },
+        data: { starts_at: startsAt, custom: { description } }
+      }).then((res) => {
+        console.log('Stream API Success:', res); // ✅ Check if this logs
+        return res;
+      }).catch((error) => {
+        console.error('Stream API Failure:', {
+          error: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+        });
+        throw error;
       });
-
-      console.log('Meeting created successfully:', call);
-      setCallDetail(call);
+      
+      console.log('Call ID Verification:', call.id); // ✅ MUST log here
+      setCallDetail(call); // ❌ Currently failing here in production
 
       if (!values.description) {
+        console.log("callid",call.id)
         console.log('Redirecting to meeting:', call.id);
         router.push(`/meeting/${call.id}`);
       }
@@ -92,7 +98,14 @@ const MeetingTypeList = () => {
 
   const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${callDetail?.id}`;
   console.log('Generated meeting link:', meetingLink);
-
+  useEffect(() => {
+    if (callDetail) {
+      console.log('callDetail State:', {
+        id: callDetail.id, 
+        state: callDetail.state,
+      });
+    }
+  }, [callDetail]);
 
       return (
         <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
