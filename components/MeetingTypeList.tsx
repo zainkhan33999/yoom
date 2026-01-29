@@ -38,61 +38,65 @@
       userLoggedIn: !!user,
     });
 
-    const createMeeting = async () => {
-      console.log('createMeeting triggered', { values, client, user });
-      if (!client || !user) {
-        console.error('Stream client or user not initialized');
-        toast.error('Please wait while we initialize the video service');
-        return;
-      }
-    
-      try {
-        if (!values.dateTime) {
-          toast('Please select a date and time');
-          return;
-        }
-    
-        const id = crypto.randomUUID();
-        const call = client.call('default', id);
-        
-        if (!call) {
-          throw new Error('Failed to initialize call');
-        }
-    
-        const startsAt = values.dateTime.toISOString();
-        const description = values.description || 'Instant Meeting';
-    
-        // Add timeout for the WebSocket connection
-        const createPromise = call.getOrCreate({
-          data: {
-            starts_at: startsAt,
-            custom: { description },
-          },
-        });
-    
-        // Add a 10-second timeout for the WebSocket connection
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Connection timeout. Please check your network.')), 10000)
-        );
-    
-        await Promise.race([createPromise, timeoutPromise]);
-    
-        setCallDetail(call);
-    
-        if (!values.description) {
-          router.push(`/meeting/${call.id}`);
-        }
-        toast.success('Meeting created successfully!');
-      } catch (error) {
-        console.error('Meeting creation failed:', error);
-        toast.error(error instanceof Error ? error.message : 'Failed to create meeting');
-        
-        // Reset meeting state if it's a connection error
-        if (error instanceof Error && error.message.includes('WS connection')) {
-          setMeetingState(undefined);
-        }
-      }
-    };
+   const createMeeting = async () => {
+  console.log('createMeeting triggered', { values, client, user });
+
+  if (!client || !user) {
+    console.error('Stream client or user not initialized');
+    toast.error('Please wait while we initialize the video service');
+    return;
+  }
+
+  try {
+    if (!values.dateTime) {
+      toast('Please select a date and time');
+      return;
+    }
+
+    const id = crypto.randomUUID();
+
+    // Attempt to create the call
+    const call = client.call('default', id);
+
+    if (!call) {
+      throw new Error('Failed to initialize call');
+    }
+
+    const startsAt = values.dateTime.toISOString();
+    const description = values.description || 'Instant Meeting';
+
+    // Wrap getOrCreate with a proper timeout
+    const result = await Promise.race([
+      call.getOrCreate({
+        data: {
+          starts_at: startsAt,
+          custom: { description },
+        },
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Connection timeout. Please check your network.')), 30000)
+      ),
+    ]);
+
+    console.log('Meeting successfully created:', result);
+
+    setCallDetail(call);
+
+    if (!values.description) {
+      router.push(`/meeting/${call.id}`);
+    }
+    toast.success('Meeting created successfully!');
+  } catch (error) {
+    console.error('Meeting creation failed:', error);
+    toast.error(error instanceof Error ? error.message : 'Failed to create meeting');
+
+    // Reset meeting state if it's a connection error
+    if (error instanceof Error && error.message.includes('Connection timeout')) {
+      setMeetingState(undefined);
+    }
+  }
+};
+
 
     if (!client || !user) {
       console.log('Client or user not ready - showing loader');
