@@ -44,9 +44,12 @@ const MeetingTypeList = () => {
     const connectUser = async () => {
       try {
         const token = await getToken(user.id);
-        await client.connectUser({ id: user.id, name: user.username }, token);
+        await client.connectUser(
+  { id: user.id, name: user.username ?? 'User' }, // fallback to 'User'
+  token
+);
         setIsClientReady(true);
-        console.log('Stream Video client connected for user:', user.username);
+
       } catch (error) {
         console.error('Failed to connect user to Stream Video:', error);
         toast.error('Failed to connect video service. Please refresh the page.');
