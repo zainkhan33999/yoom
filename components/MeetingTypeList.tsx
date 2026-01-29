@@ -72,7 +72,7 @@
     
         // Add a 10-second timeout for the WebSocket connection
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Connection timeout. Please check your network.')), 10000)
+          setTimeout(() => reject(new Error('Connection timeout. Please check your network.')), 1000000000000)
         );
     
         await Promise.race([createPromise, timeoutPromise]);
