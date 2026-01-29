@@ -1,110 +1,122 @@
-  'use client';
+'use client';
 
-  import { useState } from 'react';
-  import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-  import HomeCard from '../components/ui/HomeCard';
-  import MeetingModal from '../components/ui/MeetingModal';
-  import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
-  import { useUser } from '@clerk/nextjs';
-  import Loader from '../components/ui/Loader';
+import HomeCard from '../components/ui/HomeCard';
+import MeetingModal from '../components/ui/MeetingModal';
+import { Call, useStreamVideoClient } from '@stream-io/video-react-sdk';
+import { useUser } from '@clerk/nextjs';
+import Loader from '../components/ui/Loader';
 
-  import ReactDatePicker from 'react-datepicker';
-  import { toast } from "sonner"
-  import { Input } from './ui/input';
+import ReactDatePicker from 'react-datepicker';
+import { toast } from "sonner";
+import { Input } from './ui/input';
 
-  const initialValues = {
-    dateTime: new Date(),
-    description: '',
-    link: '',
-  };
+const initialValues = {
+  dateTime: new Date(),
+  description: '',
+  link: '',
+};
 
-  const MeetingTypeList = () => {
-    const router = useRouter();
-    const [meetingState, setMeetingState] = useState<
-      'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined
-    >(undefined);
-    const [values, setValues] = useState(initialValues);
-    const [callDetail, setCallDetail] = useState<Call>();
-    const client = useStreamVideoClient();
-    const { user } = useUser();
+// Function to get a fresh JWT token from your server
+const getToken = async (userId: string) => {
+  const res = await fetch(`/api/token?userId=${userId}`);
+  const data = await res.json();
+  return data.token;
+};
 
-    console.log("BaseUrl",process.env.NEXT_PUBLIC_BASE_URL)
-    console.log('Rendering MeetingTypeList:', {
-      meetingState,
-      values,
-      callDetail,
-      clientReady: !!client,
-      userLoggedIn: !!user,
-    });
+const MeetingTypeList = () => {
+  const router = useRouter();
+  const [meetingState, setMeetingState] = useState<
+    'isScheduleMeeting' | 'isJoiningMeeting' | 'isInstantMeeting' | undefined
+  >(undefined);
+  const [values, setValues] = useState(initialValues);
+  const [callDetail, setCallDetail] = useState<Call>();
+  const client = useStreamVideoClient();
+  const { user } = useUser();
+  const [isClientReady, setIsClientReady] = useState(false);
 
-   const createMeeting = async () => {
-  console.log('createMeeting triggered', { values, client, user });
+  // Connect the user to Stream Video when client and user are ready
+  useEffect(() => {
+    if (!client || !user) return;
 
-  if (!client || !user) {
-    console.error('Stream client or user not initialized');
-    toast.error('Please wait while we initialize the video service');
-    return;
-  }
+    const connectUser = async () => {
+      try {
+        const token = await getToken(user.id);
+        await client.connectUser({ id: user.id, name: user.username }, token);
+        setIsClientReady(true);
+        console.log('Stream Video client connected for user:', user.username);
+      } catch (error) {
+        console.error('Failed to connect user to Stream Video:', error);
+        toast.error('Failed to connect video service. Please refresh the page.');
+      }
+    };
 
-  try {
-    if (!values.dateTime) {
-      toast('Please select a date and time');
+    connectUser();
+  }, [client, user]);
+
+  const createMeeting = async () => {
+    console.log('createMeeting triggered', { values, client, user });
+
+    if (!client || !user) {
+      toast.error('Please wait while we initialize the video service');
       return;
     }
 
-    const id = crypto.randomUUID();
+    try {
+      if (!values.dateTime) {
+        toast('Please select a date and time');
+        return;
+      }
 
-    // Attempt to create the call
-    const call = client.call('default', id);
+      const id = crypto.randomUUID();
+      const call = client.call('default', id);
 
-    if (!call) {
-      throw new Error('Failed to initialize call');
+      if (!call) {
+        throw new Error('Failed to initialize call');
+      }
+
+      const startsAt = values.dateTime.toISOString();
+      const description = values.description || 'Instant Meeting';
+
+      // Wrap getOrCreate with timeout
+      const result = await Promise.race([
+        call.getOrCreate({
+          data: {
+            starts_at: startsAt,
+            custom: { description },
+          },
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Connection timeout. Please check your network.')), 30000)
+        ),
+      ]);
+
+      console.log('Meeting successfully created:', result);
+
+      setCallDetail(call);
+
+      if (!values.description) {
+        router.push(`/meeting/${call.id}`);
+      }
+      toast.success('Meeting created successfully!');
+    } catch (error) {
+      console.error('Meeting creation failed:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create meeting');
+      if (error instanceof Error && error.message.includes('Connection timeout')) {
+        setMeetingState(undefined);
+      }
     }
+  };
 
-    const startsAt = values.dateTime.toISOString();
-    const description = values.description || 'Instant Meeting';
-
-    // Wrap getOrCreate with a proper timeout
-    const result = await Promise.race([
-      call.getOrCreate({
-        data: {
-          starts_at: startsAt,
-          custom: { description },
-        },
-      }),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Connection timeout. Please check your network.')), 30000)
-      ),
-    ]);
-
-    console.log('Meeting successfully created:', result);
-
-    setCallDetail(call);
-
-    if (!values.description) {
-      router.push(`/meeting/${call.id}`);
-    }
-    toast.success('Meeting created successfully!');
-  } catch (error) {
-    console.error('Meeting creation failed:', error);
-    toast.error(error instanceof Error ? error.message : 'Failed to create meeting');
-
-    // Reset meeting state if it's a connection error
-    if (error instanceof Error && error.message.includes('Connection timeout')) {
-      setMeetingState(undefined);
-    }
+  if (!client || !user || !isClientReady) {
+    console.log('Client or user not ready - showing loader');
+    return <Loader />;
   }
-};
 
-
-    if (!client || !user) {
-      console.log('Client or user not ready - showing loader');
-      return <Loader />;
-    }
-
-    const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${callDetail?.id}`;
-    console.log('Generated meeting link:', meetingLink);
+  const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${callDetail?.id}`;
+  console.log('Generated meeting link:', meetingLink);
 
 
         return (
