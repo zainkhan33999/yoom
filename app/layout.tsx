@@ -1,18 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import StreamVideoProvider from "@/providers/steamClientProvider";
+import { Inter } from "next/font/google";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "YOOM",
@@ -21,7 +13,7 @@ export const metadata: Metadata = {
     icon:"/icons/logo.svg"
   }
 };
-
+const inter = Inter({ subsets: ["latin"] });    
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,7 +23,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <ClerkProvider>
       <body
-        className={`${geistSans.variable}  ${geistMono.variable} antialiased bg-dark2`}
+        className={inter.className}
       > 
       <StreamVideoProvider>
       {children}
