@@ -60,6 +60,11 @@ const MeetingTypeList = () => {
   }, [client, user]);
 
   const createMeeting = async () => {
+    console.log('ENV CHECK:', {
+  hasKey: !!process.env.NEXT_PUBLIC_STREAM_API_KEY,
+  hasSecret: !!process.env.STREAM_SECRET_KEY,
+});
+
     console.log('createMeeting triggered', { values, client, user });
 
     if (!client || !user) {
