@@ -1,30 +1,38 @@
-// app/api/token/route.ts
 import { NextResponse } from 'next/server';
-import { StreamChat } from 'stream-chat';
+import { StreamClient } from '@stream-io/node-sdk';
 
 export async function GET(request: Request) {
   try {
-    const url = new URL(request.url);
-    const userId = url.searchParams.get('userId');
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
 
     if (!userId) {
       return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
     }
 
-    if (!process.env.STREAM_API_KEY || !process.env.STREAM_API_SECRET) {
-      return NextResponse.json({ error: 'Missing Stream API credentials' }, { status: 500 });
+    const apiKey = process.env.STREAM_API_KEY!;
+    const apiSecret = process.env.STREAM_API_SECRET!;
+
+    if (!apiKey || !apiSecret) {
+      return NextResponse.json(
+        { error: 'Missing Stream credentials' },
+        { status: 500 }
+      );
     }
 
-    const serverClient = new StreamChat(
-      process.env.STREAM_API_KEY,
-      process.env.STREAM_API_SECRET
-    );
+    const client = new StreamClient(apiKey, apiSecret);
 
-    const token = serverClient.createToken(userId);
+    // ✅ Video-compatible token
+    const token = client.generateUserToken({
+      user_id: userId,
+    });
 
     return NextResponse.json({ token });
-  } catch (error) {
-    console.error('Error generating Stream token:', error);
-    return NextResponse.json({ error: 'Failed to generate token' }, { status: 500 });
+  } catch (err) {
+    console.error('Token error:', err);
+    return NextResponse.json(
+      { error: 'Failed to generate token' },
+      { status: 500 }
+    );
   }
 }
