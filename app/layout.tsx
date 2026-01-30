@@ -22,9 +22,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <ClerkProvider>
-      <body
-        className={inter.className}
-      > 
+    <body className={`${inter.className} bg-[#151825]`}>
+
+
       <StreamVideoProvider>
       {children}
       </StreamVideoProvider>
