@@ -1,5 +1,7 @@
 import { StreamClient } from '@stream-io/node-sdk';
 
+export const runtime = 'nodejs'; // ⬅️ VERY IMPORTANT
+
 const client = new StreamClient(
   process.env.NEXT_PUBLIC_STREAM_API_KEY!,
   process.env.STREAM_SECRET_KEY!
@@ -13,9 +15,10 @@ export async function GET(req: Request) {
     return Response.json({ error: 'Missing userId' }, { status: 400 });
   }
 
-  // ⬇️ VERY IMPORTANT
-  const token = client.createToken(userId, Math.floor(Date.now() / 1000) + 60 * 60 * 24); 
-  // 24 HOURS
+  const token = client.createToken(
+    userId,
+    Math.floor(Date.now() / 1000) + 60 * 60 * 24 // 24h
+  );
 
   return Response.json({ token });
 }
