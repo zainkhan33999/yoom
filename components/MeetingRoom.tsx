@@ -67,7 +67,21 @@ const MeetingRoom = () => {
         </div>
       </div>
       {/* video layout and call controls */}
-      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
+      <div
+  className="
+    fixed bottom-0 w-full
+   
+    flex
+
+    overflow-x-auto
+    whitespace-nowrap
+    scrollbar-hide
+    sm:overflow-x-visible
+    sm:justify-center
+  "
+>
+  <div className="flex items-center gap-5 px-4 py-2 min-w-max">
+
         <CallControls onLeave={() => router.push(`/`)} />
 
         <DropdownMenu>
@@ -98,6 +112,7 @@ const MeetingRoom = () => {
           </div>
         </button>
         {!isPersonalRoom && <EndCallButton />}
+      </div>
       </div>
     </section>
   );

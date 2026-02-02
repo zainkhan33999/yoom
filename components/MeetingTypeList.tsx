@@ -131,7 +131,7 @@
 
     if (!client || !user || !isClientReady) {
       console.log('Client or user not ready - showing loader');
-      return <Loader />;
+      
     }
 
     const meetingLink = `${process.env.NEXT_PUBLIC_BASE_URL}/${callDetail?.id}`;
