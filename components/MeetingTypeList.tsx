@@ -131,6 +131,7 @@
 
     if (!client || !user || !isClientReady) {
       console.log('Client or user not ready - showing loader');
+     return <Loader/>
       
     }
 
