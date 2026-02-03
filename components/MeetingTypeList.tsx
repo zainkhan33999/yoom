@@ -129,6 +129,25 @@
       }
     };
 
+useEffect(() => {
+  console.group('🕵️ Loader Debug');
+
+  console.log('Stream client:', client);
+  console.log('Client ready:', !!client);
+
+  console.log('Clerk user:', user);
+  console.log('User ready:', !!user);
+
+  console.log('isClientReady state:', isClientReady);
+
+  console.log(
+    'Loader condition result:',
+    !client || !user || !isClientReady ? 'SHOW LOADER' : 'RENDER UI'
+  );
+
+  console.groupEnd();
+}, [client, user, isClientReady]);
+
     if (!client || !user || !isClientReady) {
       console.log('Client or user not ready - showing loader');
      return <Loader/>
